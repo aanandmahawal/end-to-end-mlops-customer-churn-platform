@@ -86,10 +86,12 @@ X_test_processed = preprocessor.transform(
 with mlflow.start_run():
 
     model = RandomForestClassifier(
-        n_estimators=300,
-        max_depth=10,
-        random_state=42
-    )
+    n_estimators=500,
+    max_depth=15,
+    min_samples_split=5,
+    class_weight="balanced",
+    random_state=42
+)
 
     model.fit(
         X_train_processed,

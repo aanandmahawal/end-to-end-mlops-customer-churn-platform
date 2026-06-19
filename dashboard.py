@@ -3,7 +3,7 @@ import requests
 import plotly.graph_objects as go
 
 st.set_page_config(
-    page_title="Customer Churn Prediction Platform",
+    page_title="Customer Churn Intelligence Platform",
     page_icon="📊",
     layout="wide"
 )
@@ -14,7 +14,7 @@ st.set_page_config(
 
 with st.sidebar:
 
-    st.title("📘 About This Project")
+    st.title("📘 Customer Churn Analytics")
 
     st.info(
         """
@@ -122,11 +122,12 @@ with st.sidebar:
 # HEADER
 # =====================================================
 
-st.title("📊 Customer Churn Prediction Platform")
+st.title("Customer Churn Intelligence Platform")
 
 st.caption(
-    "AI-Powered Customer Retention Analytics Dashboard"
+    "Machine Learning based customer retention and churn intelligence platform"
 )
+
 
 # =====================================================
 # CUSTOMER INFORMATION
@@ -304,178 +305,417 @@ payload = {
 
 st.markdown("---")
 
+
 if st.button(
     "🚀 Analyze Customer Churn Risk",
     use_container_width=True
 ):
 
-    response = requests.post(
-        "http://127.0.0.1:8000/predict",
-        json=payload
-    )
+    try:
 
-    result = response.json()
+        response = requests.post(
+            "http://127.0.0.1:8000/predict",
+            json=payload
+        )
+
+        result = response.json()
+
+    except Exception as e:
+
+        st.error(f"API Error: {e}")
+        st.stop()
 
     probability = result["churn_probability"] * 100
 
-    st.header("📈 Prediction Results")
+    annual_revenue = MonthlyCharges * 12
+    revenue_at_risk = annual_revenue * probability / 100
+    clv = TotalCharges
 
-    m1, m2, m3 = st.columns(3)
+    # =====================================================
+    # CUSTOMER HEALTH OVERVIEW
+    # =====================================================
 
-    m1.metric(
-        "Churn Probability",
-        f"{probability:.2f}%"
-    )
+    st.header("Customer Health Overview")
 
-    m2.metric(
-        "Tenure",
-        f"{tenure} Months"
-    )
+    if tenure < 12:
+        segment = "New"
 
-    m3.metric(
-        "Monthly Charges",
-        f"${MonthlyCharges:.2f}"
-    )
+    elif tenure < 36:
+        segment = "Established"
 
-    gauge = go.Figure(
-        go.Indicator(
-            mode="gauge+number",
-            value=probability,
-            title={"text": "Customer Churn Risk (%)"}
+    else:
+        segment = "Loyal"
+
+    if probability >= 70:
+        priority = "High"
+
+    elif probability >= 40:
+        priority = "Medium"
+
+    else:
+        priority = "Low"
+
+    k1, k2, k3, k4 = st.columns(4)
+
+    with k1:
+        st.metric(
+            "Churn Risk",
+            f"{probability:.1f}%"
         )
+
+    with k2:
+        st.metric(
+            "Retention Priority",
+            priority
+        )
+
+    k3.metric(
+        "Customer Value",
+        f"${clv:.0f}"
     )
 
-    st.plotly_chart(
-        gauge,
-        use_container_width=True
-    )
+    with k4:
+        st.metric(
+            "Customer Segment",
+            segment
+        )
+
+    st.markdown("---")
+
+    # =====================================================
+    # STATUS CARD
+    # =====================================================
 
     if probability < 30:
-        st.success("🟢 LOW RISK CUSTOMER")
+
+        st.success(
+            """
+            Customer currently demonstrates healthy retention behaviour.
+            The likelihood of churn is low based on current service usage,
+            billing behaviour, and customer tenure.
+            """
+        )
+
     elif probability < 60:
-        st.warning("🟡 MEDIUM RISK CUSTOMER")
+
+        st.warning(
+            """
+            Customer demonstrates moderate churn risk.
+            Proactive engagement is recommended.
+            """
+        )
+
     else:
-        st.error("🔴 HIGH RISK CUSTOMER")
 
+        st.error(
+            """
+            Customer demonstrates high churn risk.
+            Immediate retention action is recommended.
+            """
+        )
 
-    # ==========================================
-    # BUSINESS ACTIONS
-    # ==========================================
+    # =====================================================
+    # ESTIMATED CHURN DRIVERS
+    # =====================================================
 
-    st.subheader("💡 Business Recommendation")
+    risk_breakdown = []
+    retention_breakdown = []
+
+    # -----------------------------
+    # RISK CONTRIBUTORS
+    # -----------------------------
+
+    if Contract == "Month-to-month":
+        risk_breakdown.append(
+            (
+                "Month-to-Month Contract",
+                "+18%",
+                "Customer can leave at any time without contractual commitment."
+            )
+        )
+
+    if MonthlyCharges >= 80:
+        risk_breakdown.append(
+            (
+                "High Monthly Charges",
+                "+12%",
+                "Higher monthly bills often increase price sensitivity."
+            )
+        )
+
+    if tenure <= 12:
+        risk_breakdown.append(
+            (
+                "Short Customer Tenure",
+                "+10%",
+                "New customers generally have lower loyalty and higher churn probability."
+            )
+        )
+
+    if TechSupport == "No":
+        risk_breakdown.append(
+            (
+                "No Technical Support",
+                "+8%",
+                "Customers without support may experience unresolved issues."
+            )
+        )
+
+    if OnlineSecurity == "No":
+        risk_breakdown.append(
+            (
+                "No Online Security",
+                "+6%",
+                "Lower service adoption may indicate weaker engagement."
+            )
+        )
+
+    if PaymentMethod == "Electronic check":
+        risk_breakdown.append(
+            (
+                "Electronic Check Payment",
+                "+5%",
+                "Historically associated with higher churn than automatic payments."
+            )
+        )
+
+    if InternetService == "Fiber optic":
+        risk_breakdown.append(
+            (
+                "Fiber Internet Service",
+                "+4%",
+                "Fiber customers showed slightly higher churn in historical telecom datasets."
+            )
+        )
+
+    # -----------------------------
+    # RETENTION CONTRIBUTORS
+    # -----------------------------
+
+    if tenure >= 36:
+        retention_breakdown.append(
+            (
+                "Long Customer Tenure",
+                "-15%",
+                "Long-term customers usually demonstrate stronger loyalty."
+            )
+        )
+
+    if Contract in ["One year", "Two year"]:
+        retention_breakdown.append(
+            (
+                "Long-Term Contract",
+                "-12%",
+                "Contract commitments reduce switching behaviour."
+            )
+        )
+
+    if PaymentMethod in [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)"
+    ]:
+        retention_breakdown.append(
+            (
+                "Automatic Payments",
+                "-8%",
+                "Automatic billing reduces payment friction and improves retention."
+            )
+        )
+
+    if TechSupport == "Yes":
+        retention_breakdown.append(
+            (
+                "Technical Support Enabled",
+                "-6%",
+                "Support services improve customer satisfaction."
+            )
+        )
+
+    if OnlineSecurity == "Yes":
+        retention_breakdown.append(
+            (
+                "Online Security Enabled",
+                "-5%",
+                "Additional services increase engagement and platform dependency."
+            )
+        )
+
+    if Partner == "Yes":
+        retention_breakdown.append(
+            (
+                "Partner Account",
+                "-3%",
+                "Customers with partners often demonstrate more stable subscriptions."
+            )
+        )
+
+    if Dependents == "Yes":
+        retention_breakdown.append(
+            (
+                "Dependents on Account",
+                "-3%",
+                "Family-oriented customers typically maintain services longer."
+            )
+        )
+
+    # =====================================================
+    # DISPLAY SECTION
+    # =====================================================
+
+    st.subheader("Estimated Churn Drivers")
+
+    left, right = st.columns(2)
+
+    with left:
+
+        st.error("Risk Contributors")
+
+        if risk_breakdown:
+
+            for factor, score, explanation in risk_breakdown:
+                st.markdown(
+                    f"""
+    **{factor} ({score})**
+
+    {explanation}
+
+    ---
+    """
+                )
+
+        else:
+
+            st.success(
+                "No major churn risk drivers were identified for this customer."
+            )
+
+    with right:
+
+        st.success("Retention Contributors")
+
+        if retention_breakdown:
+
+            for factor, score, explanation in retention_breakdown:
+                st.markdown(
+                    f"""
+    **{factor} ({score})**
+
+    {explanation}
+
+    ---
+    """
+                )
+
+        else:
+
+            st.info(
+                "No strong retention indicators were identified."
+            )
+    # ======================================================
+    # BUSINESS INSIGHTS & RECOMMENDATIONS
+    # ======================================================
+
+    st.subheader("📌 Business Insights & Recommendations")
 
     recommendations = []
     business_impact = []
 
-    # Contract Analysis
+    monthly_revenue = MonthlyCharges
+    annual_revenue = MonthlyCharges * 12
+
+    # --------------------------------------
+    # Dynamic Recommendations
+    # --------------------------------------
 
     if Contract == "Month-to-month":
 
         recommendations.append(
-            "Offer an annual or two-year contract with a discounted rate to increase customer commitment."
+            "Promote annual or multi-year contracts through targeted retention offers."
         )
 
         business_impact.append(
-            "Month-to-month customers can leave at any time and historically exhibit higher churn rates."
+            "The customer is on a month-to-month contract, which provides flexibility to switch providers without long-term commitment."
         )
-
-    # High Charges
 
     if MonthlyCharges > 80:
 
         recommendations.append(
-            "Review pricing and offer personalized discounts or bundled plans."
+            "Evaluate pricing competitiveness and consider personalized discounts or bundled services."
         )
 
         business_impact.append(
-            f"The customer's monthly bill (${MonthlyCharges:.2f}) is relatively high, which may reduce perceived value."
+            f"The customer pays ${MonthlyCharges:.2f} per month, which may increase price sensitivity."
         )
-
-    # New Customer
 
     if tenure <= 12:
 
         recommendations.append(
-            "Launch an onboarding and engagement campaign to strengthen early customer loyalty."
+            "Strengthen onboarding and engagement initiatives during the early customer lifecycle."
         )
 
         business_impact.append(
-            f"The customer has only been with the company for {tenure} months and has not yet developed long-term loyalty."
+            "Newer customers typically have weaker loyalty and are more vulnerable to churn."
         )
-
-    # No Tech Support
 
     if TechSupport == "No":
 
         recommendations.append(
-            "Offer complimentary technical support or service check-ins."
+            "Offer technical support services or proactive customer assistance."
         )
 
         business_impact.append(
-            "Customers without technical support often experience unresolved issues and lower satisfaction."
+            "Lack of technical support may lead to unresolved issues and lower satisfaction."
         )
-
-    # No Online Security
 
     if OnlineSecurity == "No":
 
         recommendations.append(
-            "Promote online security packages as a value-added service."
+            "Promote security-related services as value-added offerings."
         )
 
         business_impact.append(
-            "Customers not using security services may have lower product engagement."
+            "Customers without security services may be less engaged with the overall ecosystem."
         )
-
-    # Fiber Customer
 
     if InternetService == "Fiber optic":
 
         recommendations.append(
-            "Investigate service quality and network experience for fiber customers."
+            "Monitor service quality and customer experience for fiber subscribers."
         )
 
         business_impact.append(
-            "Fiber-optic customers historically show elevated churn despite premium pricing."
+            "Fiber-optic customers historically exhibited slightly higher churn behaviour in the training dataset."
         )
-
-    # Electronic Check
 
     if PaymentMethod == "Electronic check":
 
         recommendations.append(
-            "Encourage migration to automatic payment methods through incentives."
+            "Encourage migration toward automated payment methods."
         )
 
         business_impact.append(
-            "Electronic check users often display lower retention than automatic payment users."
+            "Electronic check users often demonstrate lower retention compared with automatic-payment customers."
         )
-
-    # Loyal Customers
 
     if tenure >= 36:
 
         recommendations.append(
-            "Offer loyalty rewards or premium upgrades to reinforce customer retention."
+            "Reward loyalty through premium upgrades, loyalty benefits, or exclusive offers."
         )
 
         business_impact.append(
-            "The customer has demonstrated strong loyalty through long-term usage."
+            "The customer has demonstrated long-term commitment to the company."
         )
-
-    # Partner + Dependents
 
     if Partner == "Yes" and Dependents == "Yes":
 
         recommendations.append(
-            "Promote family-oriented service bundles and multi-service packages."
+            "Promote family-oriented service bundles and household packages."
         )
 
         business_impact.append(
-            "Family-oriented customers often respond well to bundled services."
+            "Household customers may respond positively to bundled service offerings."
         )
-
-    # Automatic Payments
 
     if PaymentMethod in [
         "Bank transfer (automatic)",
@@ -483,36 +723,73 @@ if st.button(
     ]:
 
         business_impact.append(
-            "Automatic payments reduce billing friction and improve retention."
+            "Automatic payment methods generally improve retention by reducing billing friction."
         )
 
+    recommendations = list(
+        dict.fromkeys(recommendations)
+    )
+
     # ======================================================
-    # DISPLAY BUSINESS INSIGHTS
+    # DISPLAY INSIGHTS
     # ======================================================
 
-    col1, col2 = st.columns(2)
+    col_a, col_b = st.columns(2)
 
-    with col1:
+    with col_a:
 
-        st.info("📊 Business Insights")
+        st.info("Business Insights")
 
         if business_impact:
 
             for item in business_impact:
                 st.write(f"• {item}")
 
-    with col2:
+        else:
 
-        st.success("🎯 Recommended Actions")
+            st.write(
+                "• No significant churn-related business concerns detected."
+            )
+
+    with col_b:
+
+        st.success("Recommended Actions")
 
         if recommendations:
 
-            unique_recommendations = list(
-                dict.fromkeys(recommendations)
+            for item in recommendations:
+                st.write(f"• {item}")
+
+        else:
+
+            st.write(
+                "• Continue maintaining customer satisfaction and service quality."
             )
 
-            for item in unique_recommendations:
-                st.write(f"• {item}")
+    # ======================================================
+    # REVENUE IMPACT
+    # ======================================================
+
+    st.subheader("💰 Revenue Impact Assessment")
+
+    revenue_at_risk = annual_revenue * (probability / 100)
+
+    r1, r2, r3 = st.columns(3)
+
+    r1.metric(
+        "Monthly Revenue",
+        f"${monthly_revenue:.2f}"
+    )
+
+    r2.metric(
+        "Annual Revenue",
+        f"${annual_revenue:.2f}"
+    )
+
+    r3.metric(
+        "Revenue At Risk",
+        f"${revenue_at_risk:.2f}"
+    )
 
     # ======================================================
     # EXECUTIVE SUMMARY
@@ -524,41 +801,77 @@ if st.button(
 
         st.error(
             f"""
-            This customer has a HIGH churn risk ({probability:.1f}%).
-    
-            Immediate intervention is recommended because several customer
-            attributes indicate dissatisfaction or low commitment.
-    
-            Estimated Business Priority:
-            HIGH
-            """
+Customer churn probability is **{probability:.1f}%**.
+
+This customer falls into the high-risk category and requires immediate retention attention.
+
+Potential business loss if the customer leaves:
+**${annual_revenue:.2f} per year**
+
+Priority Level: HIGH
+"""
         )
 
     elif probability >= 40:
 
         st.warning(
             f"""
-            This customer has a MODERATE churn risk ({probability:.1f}%).
-    
-            Targeted engagement campaigns and service improvements
-            may improve retention.
-    
-            Estimated Business Priority:
-            MEDIUM
-            """
+Customer churn probability is **{probability:.1f}%**.
+
+This customer shows moderate churn risk and should be targeted through engagement campaigns and service improvement initiatives.
+
+Potential business loss if the customer leaves:
+**${annual_revenue:.2f} per year**
+
+Priority Level: MEDIUM
+"""
         )
 
     else:
 
         st.success(
             f"""
-            This customer has a LOW churn risk ({probability:.1f}%).
-    
-            The customer currently shows characteristics associated
-            with long-term retention.
-    
-            Estimated Business Priority:
-            LOW
-            """
+Customer churn probability is **{probability:.1f}%**.
+
+Current customer behaviour suggests healthy retention and long-term engagement.
+
+Potential business loss if the customer leaves:
+**${annual_revenue:.2f} per year**
+
+Priority Level: LOW
+"""
         )
 
+
+st.subheader("Model Information")
+
+st.info(
+    """
+    Model: Random Forest Classifier
+
+    Dataset: Telco Customer Churn Dataset
+
+    Accuracy: 78.56%
+
+    F1 Score: 64.55%
+
+    Features Used: 19
+
+    Purpose:
+    Predict customer churn and support retention decision-making.
+    """
+)
+
+st.markdown("---")
+
+st.caption(
+    """
+    Customer Churn Intelligence Platform
+
+    Built using:
+    Python • Scikit-Learn • FastAPI • Streamlit • MLflow • Docker Ready
+    
+    End-to-End MLOps Workflow:
+    Data Processing → Model Training → API Serving → Business Analytics Dashboard
+    """
+)

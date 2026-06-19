@@ -9,5 +9,4 @@ pydantic
 streamlit
 requests
 plotly
-shap
 matplotlib
