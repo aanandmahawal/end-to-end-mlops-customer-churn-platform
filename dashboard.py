@@ -810,20 +810,19 @@ Priority Level: LOW
 
 st.subheader("Model Information")
 
-st.info(
+st.markdown(
     """
-    Model: Random Forest Classifier
-
-    Dataset: Telco Customer Churn Dataset
-
-    Accuracy: 78.56%
-
-    F1 Score: 64.55%
-
-    Features Used: 19
-
-    Purpose:
-    Predict customer churn and support retention decision-making.
+    **Model:** Random Forest Classifier  
+    
+    **Dataset:** [IBM Telco Customer Churn Dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)  
+    
+    **Accuracy:** 78.56%  
+    
+    **F1 Score:** 64.55%  
+    
+    **Features Used:** 19  
+    
+    **Purpose:** Predict customer churn and support retention decision-making.
     """
 )
 
