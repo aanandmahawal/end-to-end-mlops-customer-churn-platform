@@ -4,8 +4,6 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 
-
-st.success("API Status: Connected")
 st.set_page_config(
     page_title="Customer Churn Intelligence Platform",
     page_icon="📊",
@@ -131,7 +129,31 @@ st.title("Customer Churn Intelligence Platform")
 st.caption(
     "Machine Learning based customer retention and churn intelligence platform"
 )
+# ==========================================
+# API HEALTH CHECK
+# ==========================================
 
+try:
+
+    health = requests.get(
+        "https://customer-churn-api-z5wl.onrender.com/",
+        timeout=10
+    )
+
+    if health.status_code == 200:
+
+        st.success("🟢 API Status: Connected")
+
+    else:
+
+        st.warning(
+            f"🟡 API Status: Unexpected Response ({health.status_code})"
+        )
+
+except Exception:
+
+    st.error("🔴 API Status: Disconnected")
+    
 
 # =====================================================
 # CUSTOMER INFORMATION
