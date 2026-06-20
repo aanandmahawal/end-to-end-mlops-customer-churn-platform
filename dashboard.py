@@ -402,7 +402,7 @@ if st.button(
 
     with k2:
         st.metric(
-            "Retention Priority",
+            "Retention Action Priority",
             priority
         )
 
