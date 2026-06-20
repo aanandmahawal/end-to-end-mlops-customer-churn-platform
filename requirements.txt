@@ -1,12 +1,8 @@
+streamlit
 pandas
 numpy
 scikit-learn
 joblib
-fastapi
-uvicorn
-mlflow
-pydantic
-streamlit
 requests
 plotly
-matplotlib
+matplotlibs
