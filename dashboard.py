@@ -314,8 +314,9 @@ if st.button(
     try:
 
         response = requests.post(
-            "http://127.0.0.1:8000/predict",
-            json=payload
+            "https://customer-churn-api-z5wl.onrender.com/predict",
+            json=payload,
+            timeout=60
         )
 
         result = response.json()
