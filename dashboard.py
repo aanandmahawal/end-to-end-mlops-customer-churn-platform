@@ -124,35 +124,44 @@ with st.sidebar:
 # HEADER
 # =====================================================
 
-st.title("Customer Churn Intelligence Platform")
+col1, col2 = st.columns([4, 1])
 
-st.caption(
-    "Machine Learning based customer retention and churn intelligence platform"
-)
-try:
+with col1:
 
-    health = requests.get(
-        "https://customer-churn-api-z5wl.onrender.com/",
-        timeout=10
+    st.title(
+        "Customer Churn Intelligence Platform"
     )
 
-    if health.status_code == 200:
-
-        st.caption(
-            "🟢 Backend API Connected"
-        )
-
-    else:
-
-        st.caption(
-            "🟡 Backend API Warning"
-        )
-
-except:
-
     st.caption(
-        "🔴 Backend API Offline"
-    )    
+        "Machine Learning based customer retention and churn intelligence platform"
+    )
+
+with col2:
+
+    try:
+
+        health = requests.get(
+            "https://customer-churn-api-z5wl.onrender.com/",
+            timeout=10
+        )
+
+        if health.status_code == 200:
+
+            st.success(
+                "🟢 API Online"
+            )
+
+        else:
+
+            st.warning(
+                "🟡 API Warning"
+            )
+
+    except:
+
+        st.error(
+            "🔴 API Offline"
+        )   
 
 # =====================================================
 # CUSTOMER INFORMATION
