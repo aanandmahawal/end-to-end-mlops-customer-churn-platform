@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 st.set_page_config(
@@ -367,8 +368,12 @@ if st.button(
     annual_revenue = MonthlyCharges * 12
     revenue_at_risk = annual_revenue * probability / 100
     clv = TotalCharges
+    india_time = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    )
+
     st.caption(
-        f"Prediction generated on: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}"
+        f"Prediction generated on: {india_time.strftime('%d-%m-%Y %H:%M:%S IST')}"
     )
     
     # =====================================================
