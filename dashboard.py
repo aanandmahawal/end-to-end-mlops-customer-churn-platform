@@ -375,14 +375,6 @@ if st.button(
 
     st.header("Customer Health Overview")
 
-    if tenure < 12:
-        segment = "New Customer"
-
-    elif tenure < 36:
-        segment = "Established Customer"
-
-    else:
-        segment = "Loyal Customer"
 
     if probability >= 70:
         priority = "High"
@@ -393,7 +385,7 @@ if st.button(
     else:
         priority = "Low"
 
-    k1, k2, k3, k4 = st.columns(4)
+    k1, k2, k3= st.columns(3)
 
     with k1:
         st.metric(
@@ -412,11 +404,6 @@ if st.button(
         f"${clv:.0f}"
     )
 
-    with k4:
-        st.metric(
-            "Customer Segment",
-            segment
-        )
 
     st.markdown("---")
 
