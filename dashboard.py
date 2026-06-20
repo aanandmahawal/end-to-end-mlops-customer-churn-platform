@@ -371,7 +371,7 @@ if st.button(
         )
 
     k3.metric(
-        "Customer Value",
+        "Customer Lifetime Value (CLV)",
         f"${clv:.0f}"
     )
 
