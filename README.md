@@ -41,7 +41,7 @@ Users can enter customer details and receive:
 **IBM Telco Customer Churn Dataset**
 
 Dataset Link:
-https://www.ibm.com/communities/analytics/watson-analytics-blog/guide-to-sample-datasets/
+[https://www.ibm.com/communities/analytics/watson-analytics-blog/guide-to-sample-datasets/](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 
 Target Variable:
 
