@@ -335,7 +335,10 @@ if st.button(
     annual_revenue = MonthlyCharges * 12
     revenue_at_risk = annual_revenue * probability / 100
     clv = TotalCharges
-
+    st.caption(
+        f"Prediction generated on: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}"
+    )
+    
     # =====================================================
     # CUSTOMER HEALTH OVERVIEW
     # =====================================================
@@ -847,9 +850,7 @@ Priority Level: LOW
 """
         )
 
-st.caption(
-    f"Prediction generated on: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}"
-)
+
 
 st.subheader("Model Information")
 
