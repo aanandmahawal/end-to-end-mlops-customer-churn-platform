@@ -492,87 +492,87 @@ if st.button(
         retention_breakdown.append(("Dependents on Account", -3))
 
 
-st.subheader("📊 Churn Impact Analysis")
-
-chart_data = []
-
-for factor, value in risk_breakdown:
-
-    chart_data.append(
-        {
-            "Factor": factor,
-            "Impact": value
-        }
-    )
-
-for factor, value in retention_breakdown:
-
-    chart_data.append(
-        {
-            "Factor": factor,
-            "Impact": value
-        }
-    )
-
-if chart_data:
-
-    df_chart = pd.DataFrame(chart_data)
-
-    fig = px.bar(
-        df_chart,
-        x="Impact",
-        y="Factor",
-        orientation="h",
-        text="Impact"
-    )
-
-    fig.update_layout(
-        height=400,
-        xaxis_title="Impact on Churn",
-        yaxis_title="",
-        showlegend=False,
-        margin=dict(
-            l=20,
-            r=20,
-            t=20,
-            b=20
+    st.subheader("📊 Churn Impact Analysis")
+    
+    chart_data = []
+    
+    for factor, value in risk_breakdown:
+    
+        chart_data.append(
+            {
+                "Factor": factor,
+                "Impact": value
+            }
         )
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-    strongest_risk = max(
-        risk_breakdown,
-        key=lambda x: x[1],
-        default=None
-    )
-
-    strongest_retention = min(
-        retention_breakdown,
-        key=lambda x: x[1],
-        default=None
-    )
-
-    if strongest_risk or strongest_retention:
-
-        summary = []
-
-        if strongest_risk:
-
-            summary.append(
-                f"Biggest churn driver: **{strongest_risk[0]} (+{strongest_risk[1]}%)**"
+    
+    for factor, value in retention_breakdown:
+    
+        chart_data.append(
+            {
+                "Factor": factor,
+                "Impact": value
+            }
+        )
+    
+    if chart_data:
+    
+        df_chart = pd.DataFrame(chart_data)
+    
+        fig = px.bar(
+            df_chart,
+            x="Impact",
+            y="Factor",
+            orientation="h",
+            text="Impact"
+        )
+    
+        fig.update_layout(
+            height=400,
+            xaxis_title="Impact on Churn",
+            yaxis_title="",
+            showlegend=False,
+            margin=dict(
+                l=20,
+                r=20,
+                t=20,
+                b=20
             )
-
-        if strongest_retention:
-
-            summary.append(
-                f"Strongest retention factor: **{strongest_retention[0]} ({strongest_retention[1]}%)**"
-            )
-
-        st.info(" | ".join(summary))
+        )
+    
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+    
+        strongest_risk = max(
+            risk_breakdown,
+            key=lambda x: x[1],
+            default=None
+        )
+    
+        strongest_retention = min(
+            retention_breakdown,
+            key=lambda x: x[1],
+            default=None
+        )
+    
+        if strongest_risk or strongest_retention:
+    
+            summary = []
+    
+            if strongest_risk:
+    
+                summary.append(
+                    f"Biggest churn driver: **{strongest_risk[0]} (+{strongest_risk[1]}%)**"
+                )
+    
+            if strongest_retention:
+    
+                summary.append(
+                    f"Strongest retention factor: **{strongest_retention[0]} ({strongest_retention[1]}%)**"
+                )
+    
+            st.info(" | ".join(summary))
 
     
     # ======================================================
