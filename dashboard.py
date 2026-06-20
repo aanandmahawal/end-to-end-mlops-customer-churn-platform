@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import plotly.graph_objects as go
+from datetime import datetime
+
 
 
 st.success("API Status: Connected")
@@ -845,6 +847,9 @@ Priority Level: LOW
 """
         )
 
+st.caption(
+    f"Prediction generated on: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}"
+)
 
 st.subheader("Model Information")
 
