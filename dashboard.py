@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import plotly.graph_objects as go
 
+
+st.success("API Status: Connected")
 st.set_page_config(
     page_title="Customer Churn Intelligence Platform",
     page_icon="📊",
@@ -339,13 +341,13 @@ if st.button(
     st.header("Customer Health Overview")
 
     if tenure < 12:
-        segment = "New"
+        segment = "New Customer"
 
     elif tenure < 36:
-        segment = "Established"
+        segment = "Established Customer"
 
     else:
-        segment = "Loyal"
+        segment = "Loyal Customer"
 
     if probability >= 70:
         priority = "High"
