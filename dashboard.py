@@ -441,260 +441,140 @@ if st.button(
             """
         )
 
-    # =====================================================
-    # ESTIMATED CHURN DRIVERS
-    # =====================================================
 
     risk_breakdown = []
     retention_breakdown = []
-
-    # -----------------------------
-    # RISK CONTRIBUTORS
-    # -----------------------------
-
+    
     if Contract == "Month-to-month":
-        risk_breakdown.append(
-            (
-                "Month-to-Month Contract",
-                "+18%",
-                "Customer can leave at any time without contractual commitment."
-            )
-        )
-
+        risk_breakdown.append(("Month-to-Month Contract", 18))
+    
     if MonthlyCharges >= 80:
-        risk_breakdown.append(
-            (
-                "High Monthly Charges",
-                "+12%",
-                "Higher monthly bills often increase price sensitivity."
-            )
-        )
-
+        risk_breakdown.append(("High Monthly Charges", 12))
+    
     if tenure <= 12:
-        risk_breakdown.append(
-            (
-                "Short Customer Tenure",
-                "+10%",
-                "New customers generally have lower loyalty and higher churn probability."
-            )
-        )
-
+        risk_breakdown.append(("Short Customer Tenure", 10))
+    
     if TechSupport == "No":
-        risk_breakdown.append(
-            (
-                "No Technical Support",
-                "+8%",
-                "Customers without support may experience unresolved issues."
-            )
-        )
-
+        risk_breakdown.append(("No Technical Support", 8))
+    
     if OnlineSecurity == "No":
-        risk_breakdown.append(
-            (
-                "No Online Security",
-                "+6%",
-                "Lower service adoption may indicate weaker engagement."
-            )
-        )
-
+        risk_breakdown.append(("No Online Security", 6))
+    
     if PaymentMethod == "Electronic check":
-        risk_breakdown.append(
-            (
-                "Electronic Check Payment",
-                "+5%",
-                "Historically associated with higher churn than automatic payments."
-            )
-        )
-
+        risk_breakdown.append(("Electronic Check Payment", 5))
+    
     if InternetService == "Fiber optic":
-        risk_breakdown.append(
-            (
-                "Fiber Internet Service",
-                "+4%",
-                "Fiber customers showed slightly higher churn in historical telecom datasets."
-            )
-        )
-
-    # -----------------------------
-    # RETENTION CONTRIBUTORS
-    # -----------------------------
-
+        risk_breakdown.append(("Fiber Internet Service", 4))
+    
+    
     if tenure >= 36:
-        retention_breakdown.append(
-            (
-                "Long Customer Tenure",
-                "-15%",
-                "Long-term customers usually demonstrate stronger loyalty."
-            )
-        )
-
+        retention_breakdown.append(("Long Customer Tenure", -15))
+    
     if Contract in ["One year", "Two year"]:
-        retention_breakdown.append(
-            (
-                "Long-Term Contract",
-                "-12%",
-                "Contract commitments reduce switching behaviour."
-            )
-        )
-
+        retention_breakdown.append(("Long-Term Contract", -12))
+    
     if PaymentMethod in [
         "Bank transfer (automatic)",
         "Credit card (automatic)"
     ]:
-        retention_breakdown.append(
-            (
-                "Automatic Payments",
-                "-8%",
-                "Automatic billing reduces payment friction and improves retention."
-            )
-        )
-
+        retention_breakdown.append(("Automatic Payments", -8))
+    
     if TechSupport == "Yes":
-        retention_breakdown.append(
-            (
-                "Technical Support Enabled",
-                "-6%",
-                "Support services improve customer satisfaction."
-            )
-        )
-
+        retention_breakdown.append(("Technical Support Enabled", -6))
+    
     if OnlineSecurity == "Yes":
-        retention_breakdown.append(
-            (
-                "Online Security Enabled",
-                "-5%",
-                "Additional services increase engagement and platform dependency."
-            )
-        )
-
+        retention_breakdown.append(("Online Security Enabled", -5))
+    
     if Partner == "Yes":
-        retention_breakdown.append(
-            (
-                "Partner Account",
-                "-3%",
-                "Customers with partners often demonstrate more stable subscriptions."
-            )
-        )
-
+        retention_breakdown.append(("Partner Account", -3))
+    
     if Dependents == "Yes":
-        retention_breakdown.append(
-            (
-                "Dependents on Account",
-                "-3%",
-                "Family-oriented customers typically maintain services longer."
+        retention_breakdown.append(("Dependents on Account", -3))
+
+
+st.subheader("📊 Churn Impact Analysis")
+
+chart_data = []
+
+for factor, value in risk_breakdown:
+
+    chart_data.append(
+        {
+            "Factor": factor,
+            "Impact": value
+        }
+    )
+
+for factor, value in retention_breakdown:
+
+    chart_data.append(
+        {
+            "Factor": factor,
+            "Impact": value
+        }
+    )
+
+if chart_data:
+
+    df_chart = pd.DataFrame(chart_data)
+
+    fig = px.bar(
+        df_chart,
+        x="Impact",
+        y="Factor",
+        orientation="h",
+        text="Impact"
+    )
+
+    fig.update_layout(
+        height=400,
+        xaxis_title="Impact on Churn",
+        yaxis_title="",
+        showlegend=False,
+        margin=dict(
+            l=20,
+            r=20,
+            t=20,
+            b=20
+        )
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+    strongest_risk = max(
+        risk_breakdown,
+        key=lambda x: x[1],
+        default=None
+    )
+
+    strongest_retention = min(
+        retention_breakdown,
+        key=lambda x: x[1],
+        default=None
+    )
+
+    if strongest_risk or strongest_retention:
+
+        summary = []
+
+        if strongest_risk:
+
+            summary.append(
+                f"Biggest churn driver: **{strongest_risk[0]} (+{strongest_risk[1]}%)**"
             )
-        )
 
-    # =====================================================
-    # DISPLAY SECTION
-    # =====================================================
+        if strongest_retention:
 
-    st.subheader("Estimated Churn Drivers")
-
-    left, right = st.columns(2)
-
-    with left:
-
-        st.error("Risk Contributors")
-
-        if risk_breakdown:
-
-            for factor, score, explanation in risk_breakdown:
-                st.markdown(
-                    f"""
-    **{factor} ({score})**
-
-    {explanation}
-
-    ---
-    """
-                )
-
-        else:
-
-            st.success(
-                "No major churn risk drivers were identified for this customer."
+            summary.append(
+                f"Strongest retention factor: **{strongest_retention[0]} ({strongest_retention[1]}%)**"
             )
 
-    with right:
+        st.info(" | ".join(summary))
 
-        st.success("Retention Contributors")
-
-        if retention_breakdown:
-
-            for factor, score, explanation in retention_breakdown:
-                st.markdown(
-                    f"""
-    **{factor} ({score})**
-
-    {explanation}
-
-    ---
-    """
-                )
-
-        else:
-
-            st.info(
-                "No strong retention indicators were identified."
-            )
-
-    # =====================================================
-    # CHURN DRIVER VISUALIZATION
-    # =====================================================
     
-    chart_data = []
-    
-    for factor, score, _ in risk_breakdown:
-    
-        value = int(score.replace("+", "").replace("%", ""))
-    
-        chart_data.append(
-            {
-                "Factor": factor,
-                "Impact": value,
-                "Type": "Risk"
-            }
-        )
-    
-    for factor, score, _ in retention_breakdown:
-    
-        value = int(score.replace("-", "").replace("%", ""))
-    
-        chart_data.append(
-            {
-                "Factor": factor,
-                "Impact": -value,
-                "Type": "Retention"
-            }
-        )
-    
-    if chart_data:
-    
-        st.subheader("📊 Churn Impact Analysis")
-    
-        df_chart = pd.DataFrame(chart_data)
-    
-        fig = px.bar(
-            df_chart,
-            x="Impact",
-            y="Factor",
-            orientation="h",
-            color="Type",
-            text="Impact"
-        )
-    
-        fig.update_layout(
-            height=450,
-            xaxis_title="Impact on Churn Probability",
-            yaxis_title="",
-            showlegend=True
-        )
-    
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
     # ======================================================
     # BUSINESS INSIGHTS & RECOMMENDATIONS
     # ======================================================
