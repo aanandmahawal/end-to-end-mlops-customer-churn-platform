@@ -1,5 +1,7 @@
 import streamlit as st
 import requests
+import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
@@ -636,6 +638,63 @@ if st.button(
             st.info(
                 "No strong retention indicators were identified."
             )
+
+# =====================================================
+# CHURN DRIVER VISUALIZATION
+# =====================================================
+
+chart_data = []
+
+for factor, score, _ in risk_breakdown:
+
+    value = int(score.replace("+", "").replace("%", ""))
+
+    chart_data.append(
+        {
+            "Factor": factor,
+            "Impact": value,
+            "Type": "Risk"
+        }
+    )
+
+for factor, score, _ in retention_breakdown:
+
+    value = int(score.replace("-", "").replace("%", ""))
+
+    chart_data.append(
+        {
+            "Factor": factor,
+            "Impact": -value,
+            "Type": "Retention"
+        }
+    )
+
+if chart_data:
+
+    st.subheader("📊 Churn Impact Analysis")
+
+    df_chart = pd.DataFrame(chart_data)
+
+    fig = px.bar(
+        df_chart,
+        x="Impact",
+        y="Factor",
+        orientation="h",
+        color="Type",
+        text="Impact"
+    )
+
+    fig.update_layout(
+        height=450,
+        xaxis_title="Impact on Churn Probability",
+        yaxis_title="",
+        showlegend=True
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
     # ======================================================
     # BUSINESS INSIGHTS & RECOMMENDATIONS
     # ======================================================
