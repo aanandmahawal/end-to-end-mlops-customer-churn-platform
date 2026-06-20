@@ -129,10 +129,6 @@ st.title("Customer Churn Intelligence Platform")
 st.caption(
     "Machine Learning based customer retention and churn intelligence platform"
 )
-# ==========================================
-# API HEALTH CHECK
-# ==========================================
-
 try:
 
     health = requests.get(
@@ -142,18 +138,21 @@ try:
 
     if health.status_code == 200:
 
-        st.success("🟢 API Status: Connected")
+        st.caption(
+            "🟢 Backend API Connected"
+        )
 
     else:
 
-        st.warning(
-            f"🟡 API Status: Unexpected Response ({health.status_code})"
+        st.caption(
+            "🟡 Backend API Warning"
         )
 
-except Exception:
+except:
 
-    st.error("🔴 API Status: Disconnected")
-    
+    st.caption(
+        "🔴 Backend API Offline"
+    )    
 
 # =====================================================
 # CUSTOMER INFORMATION
